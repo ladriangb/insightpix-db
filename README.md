@@ -37,15 +37,60 @@ By keeping the logic close to the data layer, InsightPix DB ensures that **all a
 
 ---
 
+## Periodic Metrics Table (Time-Bucketed Metrics)
+
+To support analytical workloads and historical trend visualization, **InsightPix DB** includes a *periodic snapshot fact table* called:
+
+```
+category_metrics_periodic
+```
+
+### Purpose
+
+This table stores **aggregated metrics over fixed time intervals** (year, quarter, month, week, day, hour, and day period).
+Each row represents a pre-calculated summary for a specific `category_id` and time bucket, allowing queries such as:
+
+- “Which category received more positive votes this week?”
+- “What is the trend of engagement per quarter?”
+- “At what time of day are users most active?”
+
+By decoupling analytical aggregation from transactional tables, the system supports both:
+
+- **Real-time updates** (via triggers on `votes` and `image_metrics`)
+- **Historical summaries** (via `category_metrics_periodic`)
+
+### Data-Mart Design
+
+This table implements a **Periodic Snapshot Fact Table** — a core pattern in dimensional modeling for time-series analytics.
+It complements the transactional and aggregated layers:
+
+| Layer         | Type              | Example Table               | Purpose                        |
+|---------------|-------------------|-----------------------------|--------------------------------|
+| 1 Transaction | Fact Table        | `votes`                     | Raw user events                |
+| 2 Aggregation | Snapshot          | `image_metrics`             | On-demand metric updates       |
+| 3 History     | Periodic Snapshot | `category_metrics_periodic` | Time-bucketed trend storage    |
+| 4 Derived     | Materialized View | `tag_stats_mv`              | Precomputed analytical results |
+
+Each level feeds the next in the *data lineage*:
+
+```
+votes → image_metrics → category_metrics_periodic → tag_stats_mv → dashboards
+```
+
+> This design enables InsightPix DB to act not only as a transactional backend but also as a compact analytical data mart.
+
+
+---
+
 ## Tech Stack
 
-| Component | Technology | Purpose |
-|------------|-------------|----------|
-| Database | **PostgreSQL 16** | Core engine |
-| Migrations | **Flyway** | Schema versioning |
-| Unit Tests | **pgTAP** | SQL testing |
-| Containerization | **Docker Compose** | Local orchestration |
-| Scripting | **Bash** / `psql` | Migration & seed automation |
+| Component        | Technology         | Purpose                     |
+|------------------|--------------------|-----------------------------|
+| Database         | **PostgreSQL 16**  | Core engine                 |
+| Migrations       | **Flyway**         | Schema versioning           |
+| Unit Tests       | **pgTAP**          | SQL testing                 |
+| Containerization | **Docker Compose** | Local orchestration         |
+| Scripting        | **Bash** / `psql`  | Migration & seed automation |
 
 ---
 
@@ -57,18 +102,16 @@ insightpix-db/
 ├── docker/
 │   ├── Dockerfile
 │   └── init/
+│       ├── optionals/
+│       │   └── 01_tags.sql
 │       ├── 01_schema.sql
-│       ├── 02_triggers.sql
-│       ├── 03_functions.sql
-│       └── 04_seed_data.sql
+│       └── 99_optionals.sh
 ├── migrations/
 │   ├── V1__initial_schema.sql
-│   ├── V2__add_functions.sql
 │   └── ...
 ├── tests/
 │   ├── 01_schema_tests.sql
-│   ├── 02_trigger_tests.sql
-│   └── 03_function_tests.sql
+│   └── ...
 ├── docker-compose.yml
 ├── scripts/
 │   ├── migrate.sh
