@@ -26,7 +26,7 @@ Even if you are the main contributor, keeping a consistent process ensures code 
 
    ```bash
    docker compose up -d
-   ./scripts/test.sh
+   docker compose exec db bash -c "sh /scripts/test.sh"
    ```
 5. **Merge back** via fast-forward or Pull Request (recommended if you want to simulate collaborative workflows).
 
@@ -74,7 +74,7 @@ All SQL-level unit tests are written using **pgTAP**.
 Run them locally:
 
 ```bash
-./scripts/test.sh
+docker compose exec db bash -c "sh /scripts/test.sh"
 ```
 
 Tests should validate:
