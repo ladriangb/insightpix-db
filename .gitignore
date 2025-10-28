@@ -1,0 +1,47 @@
+# ===============================
+# InsightPix DB - .gitignore
+# ===============================
+
+# ---- System / Editor configs ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ---- Environment & credentials ----
+.env
+.env.*
+!.env.example
+
+# ---- Docker / Compose ----
+# Docker volumes & temporary container data
+db_data/
+docker-data/
+**/data/
+**/tmp/
+**/logs/
+*.pid
+
+# ---- PostgreSQL runtime files ----
+*.sql~
+*.dump
+*.backup
+*.log
+pgdata/
+pg_dumps/
+postgresql.conf
+pg_hba.conf
+
+# ---- Build and migration outputs ----
+migrations/*.lock
+flyway.conf
+
+# ---- Testing / Coverage ----
+coverage/
+*.tap
+*.out
+*.xml
+reports/
+tests/results/
