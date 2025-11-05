@@ -31,22 +31,19 @@ CREATE OR REPLACE FUNCTION get_category_ancestors(cat_id INT)
 RETURNS TABLE(id INT) AS $$
 BEGIN
     RETURN QUERY
-    WITH RECURSIVE up(id, frontier) AS (
-        -- anchor
-        SELECT cat_id, TRUE
-        UNION ALL
-        -- expand only frontier rows
-        SELECT c.parent_id, TRUE
+    WITH RECURSIVE up(id, parent_id) AS (
+        -- anchor: start from the category itself
+        SELECT c.id, c.parent_id
         FROM categories c
-        JOIN up u ON c.id = u.id
-        WHERE u.frontier = TRUE
-          AND c.parent_id IS NOT NULL
+        WHERE c.id = cat_id
+
         UNION ALL
-        -- mark processed
-        SELECT id, FALSE
-        FROM up
-        WHERE frontier = TRUE
+
+        -- recursive: move up to parent
+        SELECT c.id, c.parent_id
+        FROM categories c
+        JOIN up u ON c.id = u.parent_id
     )
-    SELECT DISTINCT id FROM up;
+    SELECT DISTINCT up.id FROM up;
 END;
 $$ LANGUAGE plpgsql STABLE;
