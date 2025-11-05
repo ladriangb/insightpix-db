@@ -1,5 +1,5 @@
 -- ==============================================================
--- InsightPix DB - Optional Extensions Setup
+-- InsightPix DB - Core Schema Definition
 -- Version: 1.0
 -- Author: Luis Adrian Gonzalez Benavides
 -- Description:

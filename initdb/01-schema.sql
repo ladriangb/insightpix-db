@@ -74,11 +74,11 @@ COMMENT ON COLUMN votes.value IS '1 = positive vote, -1 = negative vote.';
 -- ==============================================================
 CREATE TABLE IF NOT EXISTS metrics (
     image_id INT PRIMARY KEY REFERENCES images(id) ON DELETE CASCADE,
-    total_votes INT DEFAULT 0,
-    positive_votes INT DEFAULT 0,
-    negative_votes INT DEFAULT 0,
-    score NUMERIC(5,2) DEFAULT 0.0,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    total_votes INT  NOT NULL DEFAULT 0,
+    positive_votes INT NOT NULL DEFAULT 0,
+    negative_votes INT  NOT NULL DEFAULT 0,
+    score NUMERIC(5,2)  NOT NULL DEFAULT 0.0,
+    updated_at TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 COMMENT ON TABLE metrics IS 'Aggregated statistics per image.';
