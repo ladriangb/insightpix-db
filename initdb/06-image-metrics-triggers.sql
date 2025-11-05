@@ -1,11 +1,16 @@
 -- ==============================================================
--- InsightPix DB - Core Schema Definition
--- Version: 1.0
--- Author: Luis Adrian Gonzalez Benavides
+-- InsightPix DB - Image Metrics Update Trigger
+-- Version    : 1.0
+-- Author     : Luis Adrian Gonzalez Benavides
 -- Description:
 --   Maintains real-time aggregated voting metrics for images.
---   Applies incremental updates on INSERT/DELETE to avoid full table scans.
---   Updates positive/negative/total counts, recalculates score, and refreshes updated_at.
+--   Applies incremental updates on INSERT/DELETE to avoid full rescans.
+--   Updates positive, negative, and total vote counts; recalculates score;
+--   and refreshes updated_at timestamp.
+--
+-- Notes:
+--   - Trigger-level logic: runs AFTER INSERT or DELETE on votes.
+--   - Delegates delta calculation to compute_vote_delta() for consistency.
 -- ==============================================================
 
 SET search_path TO insightpix;
@@ -20,17 +25,10 @@ DECLARE
     img_id      INT := COALESCE(NEW.image_id, OLD.image_id);
 BEGIN
     -- Determine deltas
-    IF TG_OP = 'INSERT' THEN
-        delta_pos := CASE WHEN NEW.value = 1 THEN 1 ELSE 0 END;
-        delta_neg := CASE WHEN NEW.value = -1 THEN 1 ELSE 0 END;
-        delta_total := 1;
-    ELSIF TG_OP = 'DELETE' THEN
-        delta_pos := CASE WHEN OLD.value = 1 THEN -1 ELSE 0 END;
-        delta_neg := CASE WHEN OLD.value = -1 THEN -1 ELSE 0 END;
-        delta_total := -1;
-    ELSE
-        RETURN NULL;
-    END IF;
+    SELECT d_pos, d_neg, d_tot
+    INTO delta_pos, delta_neg, delta_total
+    FROM compute_vote_delta(TG_OP, COALESCE(NEW.value, OLD.value));
+
 
     -- Ensure metrics row exists
     INSERT INTO metrics (image_id)
@@ -56,7 +54,7 @@ BEGIN
         updated_at     = CURRENT_TIMESTAMP
     WHERE image_id = img_id;
 
-    RETURN CASE WHEN TG_OP = 'INSERT' THEN NEW ELSE OLD END;
+    RETURN COALESCE(NEW, OLD);
 END;
 $$ LANGUAGE plpgsql;
 

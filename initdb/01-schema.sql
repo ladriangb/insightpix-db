@@ -1,12 +1,20 @@
--- ==============================================================
---  InsightPix DB - Core Schema Definition
---  Version: 1.0
---  Author: Luis Adrian Gonzalez Benavides
---  Description:
---    Defines the relational schema for the InsightPix ecosystem,
---    including users, categories (hierarchical), images, 
---    votes, and multiple levels of aggregated metrics.
--- ==============================================================
+-- =====================================================================
+-- InsightPix DB  - Core Schema Definition
+-- Version     : 1.0
+-- Author      : Luis Adrian Gonzalez Benavides
+--
+-- Description :
+--   Defines the database schema for the InsightPix ecosystem. Includes:
+--     • Users
+--     • Hierarchical categories
+--     • Images
+--     • Votes
+--     • Instant and periodic analytical metric layers
+--
+--   This file contains only structural definitions. No triggers or
+--   stored procedures are included here.
+-- =====================================================================
+
 
 -- === SCHEMA ===================================================
 CREATE SCHEMA IF NOT EXISTS insightpix;

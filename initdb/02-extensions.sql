@@ -1,12 +1,18 @@
 -- ==============================================================
--- InsightPix DB - Core Schema Definition
--- Version: 1.0
--- Author: Luis Adrian Gonzalez Benavides
+-- InsightPix DB - Extensions Setup
+-- Version    : 1.0
+-- Author     : Luis Adrian Gonzalez Benavides
 -- Description:
---   Enables PostgreSQL extensions required for development,
---   testing, and analytics. These are non-essential for
---   production but critical for CI / test environments.
+--   Installs PostgreSQL extensions used by InsightPix during
+--   development, testing, and analytics. These extensions are:
+--     • pgTAP       → Required for unit testing in CI environments
+--     • uuid-ossp   → Optional; provides UUID generation functions
+--
+--   Notes    :
+--     - pgTAP is intended for DEV and CI/test usage only.
+--     - uuid-ossp may be enabled in PROD if UUIDs are required.
 -- ==============================================================
+
 
 SET search_path TO public;
 

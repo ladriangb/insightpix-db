@@ -1,11 +1,12 @@
 -- ==============================================================
--- InsightPix DB  - Core Schema Definition
--- Version: 1.0
--- Author: Luis Adrian Gonzalez Benavides
+-- InsightPix DB  - Vote Integrity Enforcement
+-- Version    : 1.0
+-- Author     : Luis Adrian Gonzalez Benavides
 -- Description:
---   Blocks UPDATE operations on the votes table.
---   Enforces the rule: votes cannot be modified once created; they must be deleted and re-inserted.
---   Prevents inconsistent metric updates and preserves data integrity.
+--   Enforces the business rule that votes cannot be updated once
+--   created. Any modification must be performed as a DELETE followed
+--   by a new INSERT. This prevents metric inconsistencies and ensures
+--   data integrity at the database level (not relying on application logic).
 -- ==============================================================
 
 SET search_path TO insightpix;
