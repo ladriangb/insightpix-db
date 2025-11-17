@@ -2,6 +2,8 @@
 -- pgTAP Tests - Optional Tagging Module (Portable Version)
 -- ===============================================================
 
+SET search_path TO insightpix,public;
+
 BEGIN;
 SELECT plan(11);
 
@@ -82,5 +84,5 @@ SELECT ok(
 ---------------------------------------------------------------
 -- FINISH
 ---------------------------------------------------------------
-SELECT * FROM finish();
+SELECT finish();
 ROLLBACK;

@@ -1,8 +1,16 @@
--- ===============================================================
--- pgTAP Tests - InsightPix Core Schema
--- Version: 1.1 updated for latest schema
--- Author: Luis Adrian Gonzalez Benavides
--- ===============================================================
+-- =====================================================================
+-- InsightPix DB  - pgTAP Test Suite
+-- Version     : 1.0
+-- Author      : Luis Adrian Gonzalez Benavides
+--
+-- Module      : Core Schema Validation
+--
+-- Description :
+--   Validates the existence and structure of the core InsightPix DB schema,
+--   including tables, constraints, indices, and column definitions.
+-- =====================================================================
+
+SET search_path TO insightpix,public;
 
 BEGIN;
 
@@ -157,5 +165,5 @@ SELECT has_index('insightpix', 'category_metrics_periodic', 'idx_category_metric
 ---------------------------------------------------------------
 -- FINISH
 ---------------------------------------------------------------
-SELECT * FROM finish();
+SELECT finish();
 ROLLBACK;

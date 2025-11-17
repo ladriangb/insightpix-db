@@ -182,7 +182,7 @@ Tests are written using **pgTAP** and run automatically during CI builds.
 To execute them locally:
 
 ```bash
-docker compose run --rm db bash -c "pg_prove /tests/*.sql"
+docker compose exec db bash -c "sh /scripts/test.sh"
 ```
 
 Expected output:
