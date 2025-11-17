@@ -63,7 +63,7 @@ SELECT is(
 );
 
 ---------------------------------------------------------------
--- INSERT -1
+-- INSERT --
 ---------------------------------------------------------------
 INSERT INTO users (id, username, email)
 VALUES (-202, 'cat_user2', 'cu2@test.com');
@@ -82,7 +82,7 @@ SELECT is((SELECT total_votes FROM category_metrics WHERE category_id = -1), 2, 
 SELECT is((SELECT score       FROM category_metrics WHERE category_id = -1), 0.00, 'Root score=0');
 
 ---------------------------------------------------------------
--- DELETE -1
+-- DELETE --
 ---------------------------------------------------------------
 DELETE FROM votes WHERE image_id = -2001 AND user_id = -202;
 

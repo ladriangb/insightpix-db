@@ -71,9 +71,9 @@ COMMENT ON COLUMN images.category_id IS 'Linked category for hierarchical classi
 CREATE TABLE IF NOT EXISTS votes
 (
     id       SERIAL PRIMARY KEY,
-    image_id INT      NOT NULL REFERENCES images (id) ON DELETE CASCADE,
-    user_id  INT      NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    value    SMALLINT NOT NULL CHECK (value IN (1, -1)),
+    image_id INT       NOT NULL REFERENCES images (id) ON DELETE CASCADE,
+    user_id  INT       NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    value    SMALLINT  NOT NULL CHECK (value IN (1, -1)),
     voted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT unique_vote_per_user_per_image UNIQUE (image_id, user_id)
 );
@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS category_metrics_periodic
     positive_votes INT           DEFAULT 0,
     negative_votes INT           DEFAULT 0,
     score          NUMERIC(5, 2) DEFAULT 0.0,
-    updated_at     TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
 );
 
 COMMENT ON TABLE category_metrics_periodic IS
@@ -162,191 +162,306 @@ COMMENT ON COLUMN category_metrics_periodic.hour IS
 COMMENT ON COLUMN category_metrics_periodic.day_period IS
     'Categorical representation of time of day: morning (06–11), afternoon (12–19), night (20–05).';
 
--- Rollback: Drop only the 19 active indexes
-
+------------------------------------------------------------------------
+-- 1. YEAR
+----------------------------------------------------------------------
 DROP INDEX IF EXISTS ux_catm_year;
-DROP INDEX IF EXISTS ux_catm_year_semester;
-DROP INDEX IF EXISTS ux_catm_year_quarter;
-DROP INDEX IF EXISTS ux_catm_year_trimester;
-DROP INDEX IF EXISTS ux_catm_year_month;
-DROP INDEX IF EXISTS ux_catm_year_week_year;
-DROP INDEX IF EXISTS ux_catm_year_month_week_month;
-DROP INDEX IF EXISTS ux_catm_year_month_day;
-DROP INDEX IF EXISTS ux_catm_year_day;
-DROP INDEX IF EXISTS ux_catm_year_dow;
-DROP INDEX IF EXISTS ux_catm_year_month_dow;
-DROP INDEX IF EXISTS ux_catm_year_month_day_period;
-DROP INDEX IF EXISTS ux_catm_year_month_day_day_period;
-DROP INDEX IF EXISTS ux_catm_year_dow_day_period;
-DROP INDEX IF EXISTS ux_catm_year_month_dow_day_period;
-DROP INDEX IF EXISTS ux_catm_year_month_hour;
-DROP INDEX IF EXISTS ux_catm_year_week_year_hour;
-DROP INDEX IF EXISTS ux_catm_year_month_day_hour;
-DROP INDEX IF EXISTS ux_catm_year_hour;
-
--------------------------------------------------------
--- 1. Year
--------------------------------------------------------
 CREATE UNIQUE INDEX ux_catm_year
     ON category_metrics_periodic (category_id, year)
-    WHERE month IS NULL AND week_of_year IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND day_of_week IS NULL AND day_period IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND month         IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 2. Year + Semester
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 2. YEAR + SEMESTER
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_semester;
 CREATE UNIQUE INDEX ux_catm_year_semester
     ON category_metrics_periodic (category_id, year, semester)
-    WHERE quarter IS NULL AND trimester IS NULL AND month IS NULL
-      AND week_of_year IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND day_of_week IS NULL AND day_period IS NULL AND hour IS NULL;
+    WHERE quarter       IS NULL
+      AND trimester     IS NULL
+      AND month         IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 3. Year + Quarter
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 3. YEAR + QUARTER
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_quarter;
 CREATE UNIQUE INDEX ux_catm_year_quarter
     ON category_metrics_periodic (category_id, year, quarter)
-    WHERE semester IS NULL AND trimester IS NULL AND month IS NULL
-      AND week_of_year IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND day_of_week IS NULL AND day_period IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND trimester     IS NULL
+      AND month         IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 4. Year + Trimester
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 4. YEAR + TRIMESTER
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_trimester;
 CREATE UNIQUE INDEX ux_catm_year_trimester
     ON category_metrics_periodic (category_id, year, trimester)
-    WHERE semester IS NULL AND quarter IS NULL AND month IS NULL
-      AND week_of_year IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND day_of_week IS NULL AND day_period IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND month         IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 5. Year + Month
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 5. YEAR + MONTH
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_month;
 CREATE UNIQUE INDEX ux_catm_year_month
     ON category_metrics_periodic (category_id, year, month)
-    WHERE week_of_year IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND day_of_week IS NULL AND day_period IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 6. Year + Week of Year
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 6. YEAR + WEEK OF YEAR
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_week_year;
 CREATE UNIQUE INDEX ux_catm_year_week_year
     ON category_metrics_periodic (category_id, year, week_of_year)
-    WHERE month IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND day_of_week IS NULL AND day_period IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND month         IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 7. Year + Month + Week of Month
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 7. YEAR + MONTH + WEEK OF MONTH
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_month_week_month;
 CREATE UNIQUE INDEX ux_catm_year_month_week_month
     ON category_metrics_periodic (category_id, year, month, week_of_month)
-    WHERE week_of_year IS NULL AND day IS NULL
-      AND day_of_week IS NULL AND day_period IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND week_of_year  IS NULL
+      AND day           IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 8. Year + Month + Day
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 8. YEAR + MONTH + DAY
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_month_day;
 CREATE UNIQUE INDEX ux_catm_year_month_day
     ON category_metrics_periodic (category_id, year, month, day)
-    WHERE week_of_year IS NULL AND week_of_month IS NULL
-      AND day_of_week IS NULL AND day_period IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 9. Year + Day (no month)
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 9. YEAR + DAY (NO MONTH)
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_day;
 CREATE UNIQUE INDEX ux_catm_year_day
     ON category_metrics_periodic (category_id, year, day)
-    WHERE month IS NULL AND week_of_year IS NULL AND week_of_month IS NULL
-      AND day_of_week IS NULL AND day_period IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND month         IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 10. Year + Day of Week
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 10. YEAR + DAY OF WEEK
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_dow;
 CREATE UNIQUE INDEX ux_catm_year_dow
     ON category_metrics_periodic (category_id, year, day_of_week)
-    WHERE month IS NULL AND week_of_year IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND day_period IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND month         IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND day_period    IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 11. Year + Month + Day of Week
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 11. YEAR + MONTH + DAY OF WEEK
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_month_dow;
 CREATE UNIQUE INDEX ux_catm_year_month_dow
     ON category_metrics_periodic (category_id, year, month, day_of_week)
-    WHERE week_of_year IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND day_period IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND day_period    IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 12. Year + Month + Day Period
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 12. YEAR + MONTH + DAY PERIOD
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_month_day_period;
 CREATE UNIQUE INDEX ux_catm_year_month_day_period
     ON category_metrics_periodic (category_id, year, month, day_period)
-    WHERE week_of_year IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND day_of_week IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND day_of_week   IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 13. Year + Month + Day + Day Period
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 13. YEAR + MONTH + DAY + DAY PERIOD
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_month_day_day_period;
 CREATE UNIQUE INDEX ux_catm_year_month_day_day_period
     ON category_metrics_periodic (category_id, year, month, day, day_period)
-    WHERE week_of_year IS NULL AND week_of_month IS NULL
-      AND day_of_week IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day_of_week   IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 14. Year + Day of Week + Day Period
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 14. YEAR + DAY OF WEEK + DAY PERIOD
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_dow_day_period;
 CREATE UNIQUE INDEX ux_catm_year_dow_day_period
     ON category_metrics_periodic (category_id, year, day_of_week, day_period)
-    WHERE month IS NULL AND week_of_year IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND month         IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 15. Year + Month + Day of Week + Day Period
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 15. YEAR + MONTH + DAY OF WEEK + DAY PERIOD
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_month_dow_day_period;
 CREATE UNIQUE INDEX ux_catm_year_month_dow_day_period
     ON category_metrics_periodic (category_id, year, month, day_of_week, day_period)
-    WHERE week_of_year IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND hour IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND hour          IS NULL;
 
--------------------------------------------------------
--- 16. Year + Month + Hour
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 16. YEAR + MONTH + HOUR
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_month_hour;
 CREATE UNIQUE INDEX ux_catm_year_month_hour
     ON category_metrics_periodic (category_id, year, month, hour)
-    WHERE week_of_year IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND day_of_week IS NULL AND day_period IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL;
 
--------------------------------------------------------
--- 17. Year + Week of Year + Hour
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 17. YEAR + WEEK OF YEAR + HOUR
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_week_year_hour;
 CREATE UNIQUE INDEX ux_catm_year_week_year_hour
     ON category_metrics_periodic (category_id, year, week_of_year, hour)
-    WHERE month IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND day_of_week IS NULL AND day_period IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND month         IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL;
 
--------------------------------------------------------
--- 18. Year + Month + Day + Hour
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 18. YEAR + MONTH + DAY + HOUR
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_month_day_hour;
 CREATE UNIQUE INDEX ux_catm_year_month_day_hour
     ON category_metrics_periodic (category_id, year, month, day, hour)
-    WHERE week_of_year IS NULL AND week_of_month IS NULL
-      AND day_of_week IS NULL AND day_period IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL;
 
--------------------------------------------------------
--- 19. Year + Hour
--------------------------------------------------------
+----------------------------------------------------------------------
+-- 19. YEAR + HOUR
+----------------------------------------------------------------------
+DROP INDEX IF EXISTS ux_catm_year_hour;
 CREATE UNIQUE INDEX ux_catm_year_hour
     ON category_metrics_periodic (category_id, year, hour)
-    WHERE month IS NULL AND week_of_year IS NULL AND week_of_month IS NULL
-      AND day IS NULL AND day_of_week IS NULL AND day_period IS NULL;
+    WHERE semester      IS NULL
+      AND quarter       IS NULL
+      AND trimester     IS NULL
+      AND month         IS NULL
+      AND week_of_year  IS NULL
+      AND week_of_month IS NULL
+      AND day           IS NULL
+      AND day_of_week   IS NULL
+      AND day_period    IS NULL;
 
 -- =====================================================================
 -- Additional performance indexes (non-unique)
 -- =====================================================================
 CREATE INDEX IF NOT EXISTS idx_catm_category_year
-    ON category_metrics_periodic(category_id, year);
+    ON category_metrics_periodic (category_id, year);
 
 CREATE INDEX IF NOT EXISTS idx_catm_updated_at
-    ON category_metrics_periodic(updated_at);
+    ON category_metrics_periodic (updated_at);
 
 -- ==============================================================
 -- INDEXES
